@@ -6,6 +6,11 @@ import android.os.Bundle;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContract;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -15,6 +20,8 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.time.Instant;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final int REQUEST_LOGIN = 100;
@@ -23,11 +30,30 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        ActivityResultLauncher<Intent> launcher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(), result -> {
+                    if(result.getResultCode() != RESULT_OK){
+                            finish();
+                        }
+                }
+        );
+       /* ActivityResultLauncher<Intent> launcher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+                    @Override
+                    public void onActivityResult(ActivityResult result) {
+                        if(result.getResultCode() != RESULT_OK){
+                            finish();
+                        }
+                    }
+                }
+        );*/
         setContentView(R.layout.activity_main);
         // 如果未登入將會執行intent
         if(!logon){
             Intent intent = new Intent(this,LoginActivity.class);
-              startActivityForResult(intent,REQUEST_LOGIN);
+            launcher.launch(intent);
+//              startActivityForResult(intent,REQUEST_LOGIN); androidx版本不能用
 //            startActivity(intent);
         }
 
@@ -44,15 +70,15 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == REQUEST_LOGIN){
-            if(requestCode != RESULT_OK){
-                finish();
-            }
-        }
-    }
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        if(requestCode == REQUEST_LOGIN){
+//            if(requestCode != RESULT_OK){
+//                finish();
+//            }
+//        }
+//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
