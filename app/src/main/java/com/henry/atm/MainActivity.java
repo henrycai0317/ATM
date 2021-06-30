@@ -11,21 +11,38 @@ import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContract;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String TAG = MainActivity.class.getSimpleName();
     private static final int REQUEST_LOGIN = 100;
     boolean logon = false;
+    private List<Fuction> fuctions;
+    //    String[] functions = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +85,84 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+
+        //Recycler
+        setUpFunctions();
+
+
+        RecyclerView recyclerView = findViewById(R.id.recycler);
+        recyclerView.setHasFixedSize(true);
+//        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setLayoutManager(new GridLayoutManager(this,3));
+        //Adapter
+//        FunctionAdapter adapter = new FunctionAdapter(this);
+        IconAdapter adapter = new IconAdapter();
+        recyclerView.setAdapter(adapter);
+
     }
+
+    private void setUpFunctions() {
+        fuctions = new ArrayList<>();
+        String[] funcs = getResources().getStringArray(R.array.functions);
+        fuctions.add(new Fuction(funcs[0],R.drawable.func_transaction));
+        fuctions.add(new Fuction(funcs[1],R.drawable.func_balance));
+        fuctions.add(new Fuction(funcs[2],R.drawable.func_finance));
+        fuctions.add(new Fuction(funcs[3],R.drawable.func_contacts));
+        fuctions.add(new Fuction(funcs[4],R.drawable.func_exit));
+    }
+
+    public class IconAdapter extends RecyclerView.Adapter<IconAdapter.IconHolder> {
+
+        @NonNull
+        @Override
+        public IconHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View view = getLayoutInflater().inflate(R.layout.item_icon,parent,false);
+            return new IconHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull IconHolder holder, int position) {
+            Fuction fuction = fuctions.get(position);
+            holder.nameText.setText(fuction.getName());
+            holder.iconImage.setImageResource(fuction.getIcon());
+            holder.itemView.setOnClickListener(view -> {
+                itemClicked(fuction);
+            });
+        }
+
+        @Override
+        public int getItemCount() {
+            return fuctions.size();
+        }
+
+        public class IconHolder extends RecyclerView.ViewHolder{
+            ImageView iconImage;
+            TextView nameText;
+            public IconHolder(@NonNull View itemView) {
+                super(itemView);
+                iconImage = itemView.findViewById(R.id.item_icon);
+                nameText = itemView.findViewById(R.id.item_name);
+            }
+        }
+    }
+
+    private void itemClicked(Fuction fuction) {
+        Log.d(TAG, "itemClicked: "+fuction.getName());
+        switch (fuction.getIcon()){
+            case R.drawable.func_transaction:
+                break;
+            case R.drawable.func_balance:
+                break;
+            case R.drawable.func_finance:
+                break;
+            case R.drawable.func_contacts:
+                break;
+            case R.drawable.func_exit:
+                finish();
+                break;
+        }
+    }
+
 
 //    @Override
 //    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
